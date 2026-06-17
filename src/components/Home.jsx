@@ -4,8 +4,8 @@ import About from "./Sections/About";
 import Skills from "./Sections/Skills";
 import Projects from "./Sections/Projects";
 import Experience from "./Sections/Experience";
-import Contact from "./Sections/Contact";
 import LeftPanel from "./LeftPanel";
+import Footer from "./Sections/Footer";
 
 const Home = () => {
   return (
@@ -17,10 +17,10 @@ const Home = () => {
       <main className="w-full lg:w-[65%] bg-[#F8F7F2]">
         <Hero />
         <About />
-        <Skills />
         <Projects />
+        <Skills />
         <Experience />
-        <Contact />
+        <Footer />
       </main>
     </div>
   );

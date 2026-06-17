@@ -10,11 +10,11 @@ const LeftPanel = () => {
           <img
             src="/me.jpg"
             alt="Portfolio Portrait"
-            className="w-full max-w-65 lg:max-w-[340px] rounded-2xl object-cover shadow-sm transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10 hover:scale-[1.01]"
+            className="w-full max-w-65 lg:max-w-[200x] rounded-2xl object-cover shadow-sm transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10 hover:scale-[1.01]"
           />
         </div>
 
-        <div className="flex flex-col items-center lg:items-start text-center lg:text-left gap-3 mt-8">
+        <div className="flex flex-col items-center lg:items-start text-center lg:text-left gap-3 mt-3">
           <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider">
             Hi, My Name is
           </h3>
@@ -33,9 +33,9 @@ const LeftPanel = () => {
             into reliable software.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-3 mt-4">
+          <div className="flex flex-col sm:flex-row gap-3 mt-2">
             <MagneticButton>
-              <button className="border border-black px-4 py-2 text-sm font-medium rounded-full hover:bg-black hover:text-white transition-all duration-200">
+              <button onClick={() => window.location.href = 'mailto:anthony@anthonynelson.in'} className="border border-black px-4 py-2 text-sm font-medium rounded-full hover:bg-black hover:text-white transition-all duration-200">
                 Reach me
               </button>
             </MagneticButton>
@@ -49,7 +49,7 @@ const LeftPanel = () => {
         </div>
       </Stagerred>
 
-      <div className="flex justify-center lg:justify-start gap-5 text-xl text-gray-700 mt-10 pt-4">
+      <div className="flex justify-center lg:justify-start gap-5 text-xl text-gray-700 mt-5 pt-4">
         <a
           href="https://github.com/AnthonyNelsonSelvan"
           target="_blank"
