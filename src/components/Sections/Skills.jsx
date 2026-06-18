@@ -1,28 +1,28 @@
 import {
-  FaJs,
-  FaPython,
-  FaReact,
-  FaNodeJs,
+  FaCode,
+  FaCss3Alt,
+  FaDatabase,
   FaDocker,
   FaGitAlt,
   FaGithub,
-  FaCss3Alt,
   FaHtml5,
-  FaDatabase,
+  FaJs,
+  FaNodeJs,
+  FaPython,
+  FaReact,
   FaServer,
   FaTools,
-  FaCode,
 } from "react-icons/fa";
 
 import {
-  SiTypescript,
   SiExpress,
+  SiLinux,
   SiMongodb,
+  SiNginx,
+  SiPostman,
   SiRedis,
   SiTailwindcss,
-  SiPostman,
-  SiLinux,
-  SiNginx,
+  SiTypescript,
 } from "react-icons/si";
 
 import { VscVscode } from "react-icons/vsc";
@@ -38,7 +38,6 @@ const sections = [
       { name: "SQL", icon: "" },
     ],
   },
-
   {
     title: "Backend",
     icon: <FaServer />,
@@ -49,7 +48,6 @@ const sections = [
       { name: "JWT", icon: "" },
     ],
   },
-
   {
     title: "Databases & Caching",
     icon: <FaDatabase />,
@@ -58,7 +56,6 @@ const sections = [
       { name: "Redis", icon: <SiRedis /> },
     ],
   },
-
   {
     title: "Frontend",
     icon: "",
@@ -69,7 +66,6 @@ const sections = [
       { name: "Tailwind CSS", icon: <SiTailwindcss /> },
     ],
   },
-
   {
     title: "Infrastructure",
     icon: <FaTools />,
@@ -82,10 +78,9 @@ const sections = [
       { name: "System Design", icon: "" },
     ],
   },
-
   {
     title: "Developer Tools",
-    icon: "🚀",
+    icon: <FaTools />,
     skills: [
       { name: "Git", icon: <FaGitAlt /> },
       { name: "GitHub", icon: <FaGithub /> },

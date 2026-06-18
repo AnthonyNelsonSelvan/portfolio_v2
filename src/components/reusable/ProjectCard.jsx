@@ -12,7 +12,7 @@ const ProjectCard = ({ project }) => {
           />
         ) : (
           <div className="aspect-16/10 flex items-center justify-center text-6xl text-[#3F6B5733]">
-            ▦
+            ::
           </div>
         )}
       </div>
@@ -51,7 +51,7 @@ const ProjectCard = ({ project }) => {
             className="inline-flex items-center gap-2 text-[#3F6B57] transition-all duration-300 hover:gap-4"
           >
             Explore Project
-            <span>→</span>
+            <span>-&gt;</span>
           </Link>
 
           <a
@@ -60,7 +60,7 @@ const ProjectCard = ({ project }) => {
             rel="noopener noreferrer"
             className="text-neutral-400 hover:text-neutral-800"
           >
-            GitHub ↗
+            GitHub -&gt;
           </a>
         </div>
       </div>

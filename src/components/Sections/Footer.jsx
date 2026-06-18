@@ -4,23 +4,19 @@ const Footer = () => {
   return (
     <footer className="mt-32 border-t border-[#DDD7C8]">
       <div className="max-w-3xl mx-auto px-6 py-24 text-center">
-
         <p className="text-3xl font-semibold text-[#1D1D1D]">
           Thanks for taking the time
           <br />
           to explore my work.
         </p>
 
-        <p className="mt-6 text-lg text-gray-600">
-          See you around.
-        </p>
+        <p className="mt-6 text-lg text-gray-600">See you around.</p>
 
         <p className="mt-3 text-[#3F6B57] font-medium">
-          — Anthony Nelson
+          - Anthony Nelson
         </p>
 
         <div className="mt-12 flex justify-center items-center gap-8">
-
           <a
             href="https://github.com/AnthonyNelsonSelvan"
             target="_blank"
@@ -48,19 +44,17 @@ const Footer = () => {
             <FaEnvelope className="text-lg group-hover:-translate-y-1 transition-transform duration-300" />
             <span>Email</span>
           </a>
-
         </div>
 
         <div className="mt-16 pt-8 border-t border-[#DDD7C8]">
           <p className="text-sm tracking-wide text-gray-500">
-            © 2026 Anthony Nelson
+            Copyright 2026 Anthony Nelson
           </p>
 
           <p className="mt-2 text-sm text-gray-400">
             Built with React & Tailwind CSS
           </p>
         </div>
-
       </div>
     </footer>
   );
