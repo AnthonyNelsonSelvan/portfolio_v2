@@ -60,10 +60,10 @@ export const projects = [
     ],
 
     screenshots: [
-      { src: null, alt: "Dashboard", label: "Dashboard" },
-      { src: null, alt: "Create Domain", label: "Create Domain" },
-      { src: null, alt: "DNS Records", label: "DNS Records" },
-      { src: null, alt: "Admin Panel", label: "Admin Panel" },
+      { src: "/dnsDash.png", alt: "Dashboard", label: "Dashboard" },
+      { src: "/dnsCreate.png", alt: "Create Domain", label: "Create Domain" },
+      { src: "/dnsRecords.png", alt: "DNS Records", label: "DNS Records" },
+      { src: "/dnsLookup.png", alt: "Ns Lookup", label: "Ns Lookup" },
     ],
 
     techStack: [

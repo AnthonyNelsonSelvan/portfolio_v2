@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from "react";
-import { motion, useInView, animate } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import { useParams, useNavigate } from "react-router-dom";
 import { projects } from "../../data/detailed";
 
@@ -65,10 +65,10 @@ function SectionHeader({ label, heading }) {
 
 // ─── Architecture animation ───────────────────────────────────────────────────
 function Architecture({ steps }) {
-  const [active, setActive] = useState(-1);   // -1 = idle
+  const [active, setActive] = useState(-1);
   const [running, setRunning] = useState(false);
   const ref = useRef(null);
-  const inView = useInView(ref, { once: false, margin: "-80px" });
+  useInView(ref, { once: false, margin: "-80px" });
 
   const run = () => {
     if (running) return;
@@ -79,7 +79,6 @@ function Architecture({ steps }) {
   useEffect(() => {
     if (active < 0 || !running) return;
     if (active >= steps.length) {
-      // hold last, then reset
       const t = setTimeout(() => { setActive(-1); setRunning(false); }, 800);
       return () => clearTimeout(t);
     }
@@ -89,7 +88,6 @@ function Architecture({ steps }) {
 
   return (
     <div ref={ref} style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-      {/* Trigger button */}
       <motion.button
         onClick={run}
         whileHover={{ backgroundColor: running ? C.border : C.accent, color: running ? C.muted : "#F7F3EE" }}
@@ -108,16 +106,13 @@ function Architecture({ steps }) {
         {running ? "Running…" : active >= steps.length ? "Run Again →" : "Start Architecture →"}
       </motion.button>
 
-      {/* Steps */}
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 0, width: "100%", maxWidth: "360px" }}>
         {steps.map((step, i) => {
-          const isActive  = active === i;
-          const isDone    = active > i;
-          const isIdle    = active < 0;
+          const isActive = active === i;
+          const isDone   = active > i;
 
           return (
             <div key={step.id} style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
-              {/* Box */}
               <motion.div
                 animate={{
                   borderColor: isActive ? C.accent : isDone ? "#A8C5B5" : C.border,
@@ -155,18 +150,13 @@ function Architecture({ steps }) {
                 </motion.div>
               </motion.div>
 
-              {/* Connector */}
               {i < steps.length - 1 && (
                 <div style={{ position: "relative", width: "1px", height: "28px", background: C.border }}>
                   <motion.div
                     animate={{ scaleY: isDone ? 1 : 0 }}
                     transition={{ duration: 0.25 }}
-                    style={{
-                      position: "absolute", inset: 0,
-                      background: C.accent, transformOrigin: "top",
-                    }}
+                    style={{ position: "absolute", inset: 0, background: C.accent, transformOrigin: "top" }}
                   />
-                  {/* Moving dot */}
                   {isActive && (
                     <motion.div
                       initial={{ top: 0, opacity: 1 }}
@@ -174,8 +164,7 @@ function Architecture({ steps }) {
                       transition={{ duration: 0.5, ease: "easeIn" }}
                       style={{
                         position: "absolute", left: "50%", transform: "translateX(-50%)",
-                        width: "7px", height: "7px", borderRadius: "50%",
-                        background: C.accent,
+                        width: "7px", height: "7px", borderRadius: "50%", background: C.accent,
                       }}
                     />
                   )}
@@ -189,7 +178,7 @@ function Architecture({ steps }) {
   );
 }
 
-// ─── Screenshot placeholder ───────────────────────────────────────────────────
+// ─── Screenshot card (used in the grid section) ───────────────────────────────
 function ScreenshotCard({ screenshot, index, parentInView }) {
   return (
     <motion.div
@@ -221,6 +210,73 @@ function ScreenshotCard({ screenshot, index, parentInView }) {
         <p style={{ margin: 0, fontSize: "12px", color: C.muted, fontWeight: 500 }}>
           {screenshot.label}
         </p>
+      </div>
+    </motion.div>
+  );
+}
+
+// ─── Hero Screenshot Gallery ──────────────────────────────────────────────────
+function HeroGallery({ screenshots }) {
+  const [active, setActive] = useState(0);
+  const current = screenshots[active];
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 32 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.4, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+      style={{ width: "100%", marginBottom: "96px" }}
+    >
+      {/* Main image */}
+      <div style={{
+        width: "100%", aspectRatio: "16/8",
+        background: C.pill, borderRadius: "12px",
+        border: `1px solid ${C.border}`,
+        overflow: "hidden", marginBottom: "10px",
+      }}>
+        <motion.img
+          key={current.src}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.25 }}
+          src={current.src}
+          alt={current.alt}
+          style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+        />
+      </div>
+
+      {/* Thumbnails */}
+      <div style={{ display: "flex", gap: "8px" }}>
+        {screenshots.map((shot, i) => (
+          <div key={i} style={{ flex: 1 }}>
+            <div
+              onClick={() => setActive(i)}
+              style={{
+                aspectRatio: "16/9",
+                borderRadius: "8px",
+                border: `1px solid ${i === active ? C.accent : C.border}`,
+                overflow: "hidden",
+                cursor: "pointer",
+                opacity: i === active ? 1 : 0.5,
+                transition: "opacity 0.15s, border-color 0.15s",
+              }}
+            >
+              <img
+                src={shot.src}
+                alt={shot.label}
+                style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+              />
+            </div>
+            <p style={{
+              fontSize: "11px", color: i === active ? C.heading : C.muted,
+              textAlign: "center", margin: "5px 0 0",
+              fontWeight: i === active ? 600 : 400,
+              transition: "color 0.15s",
+            }}>
+              {shot.label}
+            </p>
+          </div>
+        ))}
       </div>
     </motion.div>
   );
@@ -382,24 +438,10 @@ export default function ProjectCaseStudy() {
           )}
         </motion.div>
 
-        {/* Hero screenshot placeholder */}
-        <motion.div
-          initial={{ opacity: 0, y: 32 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-          style={{
-            width: "100%", aspectRatio: "16/8",
-            background: C.pill, borderRadius: "12px",
-            border: `1px solid ${C.border}`,
-            display: "flex", alignItems: "center", justifyContent: "center",
-            marginBottom: "96px",
-          }}
-        >
-          <div style={{ textAlign: "center" }}>
-            <p style={{ fontSize: "28px", opacity: 0.3, margin: "0 0 8px" }}>🖥</p>
-            <p style={{ fontSize: "13px", color: C.muted, fontWeight: 500 }}>Dashboard Screenshot</p>
-          </div>
-        </motion.div>
+        {/* ── Hero Gallery (replaces placeholder) ── */}
+        {project.screenshots?.length > 0 && (
+          <HeroGallery screenshots={project.screenshots} />
+        )}
       </div>
 
       {/* ── Body sections ──────────────────────────────────────────── */}
@@ -411,7 +453,8 @@ export default function ProjectCaseStudy() {
           <p style={{ fontSize: "16px", color: "#555", lineHeight: 1.8, maxWidth: "680px", margin: "0 0 40px" }}>
             {project.overview}
           </p>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "0", border: `1px solid ${C.border}`, borderRadius: "8px", overflow: "hidden" }}
+          <div
+            style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "0", border: `1px solid ${C.border}`, borderRadius: "8px", overflow: "hidden" }}
             className="overview-stats"
           >
             {project.overviewStats.map((s, i) => (
