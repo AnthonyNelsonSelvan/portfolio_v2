@@ -138,7 +138,7 @@ const About = () => {
             className="mt-10 space-y-6 text-lg leading-9 text-gray-600"
           >
             <p>
-              I enjoy understanding how software works beneath the surface —
+              I enjoy understanding how software works beneath the surface
               from designing scalable APIs and backend architectures to
               automating deployments and managing infrastructure.
             </p>
