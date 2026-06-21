@@ -4,14 +4,14 @@ export const projects = [
     title: "DNS Management Platform",
     tagline: "Automating secure DNS provisioning through asynchronous infrastructure.",
     status: "Completed",
-    role: "Full-Stack Developer",
+    role: "Full Stack Developer",
     duration: "12 Weeks",
     focus: "DNS Automation & Backend Infrastructure",
     liveUrl: null,
     githubUrl: "https://github.com/AnthonyNelsonSelvan/dnstitle",
 
     overview:
-      "A full-stack platform that enables users to securely request, manage, and provision custom subdomains through automated BIND9 integration.",
+      "A full stack platform that enables users to securely request, manage, and provision custom subdomains through automated BIND9 integration.",
 
     overviewStats: [
       { label: "Users",          value: "Auth & Roles" },
@@ -21,10 +21,10 @@ export const projects = [
     ],
 
     problem:
-      "Students and developers often need a professional subdomain for portfolios, demos, or projects. Managing DNS records manually is slow and error-prone. This platform automates the entire process while validating requests and protecting against malicious configurations.",
+      "Students and developers often need a professional subdomain for portfolios, demos, or projects. Managing DNS records manually is slow and error prone. This platform automates the entire process while validating requests and protecting against malicious configurations.",
 
     solution:
-      "A full-stack web application where users register, request subdomains, and have DNS records provisioned automatically in the background — with abuse checks, ownership validation, and real-time queue processing.",
+      "A full stack web application where users register, request subdomains, and have DNS records provisioned automatically in the background with abuse checks, ownership validation, and real-time queue processing.",
 
     architecture: [
       { id: "user",       label: "User",                sublabel: "Browser" },
@@ -75,10 +75,10 @@ export const projects = [
 
     challengeTitle: "Integrating BIND9 with a Node.js Backend",
     challenge:
-      "The hardest part of this project was making BIND9 respond reliably to programmatic DNS updates. BIND9 uses TSIG (Transaction Signature) keys for authenticated zone updates via nsupdate — a command-line tool that expects a very specific input format. Getting child_process.spawn() to pipe the right instructions, handle stderr correctly, and confirm that the record was actually written (not just accepted) required significant debugging of DNS zones, TTL propagation, and error states that BIND9 doesn't always surface clearly.",
+      "The hardest part of this project was making BIND9 respond reliably to programmatic DNS updates. BIND9 uses TSIG (Transaction Signature) keys for authenticated zone updates via nsupdate a command-line tool that expects a very specific input format. Getting child_process.spawn() to pipe the right instructions, handle stderr correctly, and confirm that the record was actually written (not just accepted) required significant debugging of DNS zones, TTL propagation, and error states that BIND9 doesn't always surface clearly.",
 
     learnings:
-      "Building this project helped me understand how DNS servers operate at a low level, how asynchronous workers improve system responsiveness and decouple concerns, and how infrastructure components such as Redis, BullMQ, and BIND9 interact in a production-like environment. It also reinforced the importance of validation layers — both at the API level and at the infrastructure level.",
+      "Building this project helped me understand how DNS servers operate at a low level, how asynchronous workers improve system responsiveness and decouple concerns, and how infrastructure components such as Redis, BullMQ, and BIND9 interact in a production-like environment. It also reinforced the importance of validation layers both at the API level and at the infrastructure level.",
 
     future: [
       "Wildcard DNS support",

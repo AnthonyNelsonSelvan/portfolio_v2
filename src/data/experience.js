@@ -32,7 +32,7 @@ export const experiences = [
       },
       {
         title: "Tech Stack",
-        items: ["React", "Node.js", "Express", "MongoDB", "Docker"],
+        items: ["React", "Node.js", "Express", "MongoDB"],
       },
     ],
 

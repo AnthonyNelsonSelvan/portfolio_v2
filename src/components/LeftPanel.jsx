@@ -10,7 +10,7 @@ const LeftPanel = () => {
           <img
             src="/me.jpg"
             alt="Portfolio Portrait"
-            className="w-full max-w-65 lg:max-w-[200x] rounded-2xl object-cover shadow-sm transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10 hover:scale-[1.01]"
+            className="w-full max-w-65 lg:max-w-[200x] lg:max-h-[310px] rounded-2xl object-cover shadow-sm transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10 hover:scale-[1.01]"
           />
         </div>
 
@@ -42,14 +42,16 @@ const LeftPanel = () => {
 
             <MagneticButton>
               <button className="border border-black px-4 py-2 text-sm font-medium rounded-full hover:bg-black hover:text-white transition-all duration-200">
+                <a href="/Anthony_Nelson_CV.pdf" download={true}>
                 Download CV
+                </a>
               </button>
             </MagneticButton>
           </div>
         </div>
       </Stagerred>
 
-      <div className="flex justify-center lg:justify-start gap-5 text-xl text-gray-700 mt-5 pt-4">
+      <div className="flex justify-center lg:justify-start gap-5 text-xl text-gray-700 mt-2 pt-4">
         <a
           href="https://github.com/AnthonyNelsonSelvan"
           target="_blank"
