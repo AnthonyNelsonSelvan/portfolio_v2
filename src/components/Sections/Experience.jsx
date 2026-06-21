@@ -3,7 +3,6 @@ import { motion, useInView, useScroll, useTransform, animate } from "framer-moti
 import { useNavigate } from "react-router-dom";
 import { experiences } from "../../data/experience";
 
-// Defined outside — stable reference, no recreation on render
 const SPRING_EASE = [0.16, 1, 0.3, 1];
 
 const pillStyle = {
@@ -19,11 +18,9 @@ const pillStyle = {
   whiteSpace: "nowrap",
 };
 
-// Pure component — only re-renders if label changes
 const Pill = memo(({ label }) => (
   <span style={pillStyle}>{label}</span>
 ));
-
 Pill.displayName = "Pill";
 
 function Counter({ target, suffix = "" }) {
@@ -52,7 +49,6 @@ function Counter({ target, suffix = "" }) {
   );
 }
 
-// Memoized — skips re-render if value/label/suffix/index unchanged
 const StatCard = memo(({ value, label, suffix = "", index }) => {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-40px" });
@@ -66,7 +62,7 @@ const StatCard = memo(({ value, label, suffix = "", index }) => {
       style={{ borderTop: "1px solid #DDD7C8", paddingTop: "20px", paddingBottom: "4px" }}
     >
       <p style={{
-        fontSize: "26px", fontWeight: 600, color: "#1D1D1D",
+        fontSize: "clamp(18px, 4vw, 26px)", fontWeight: 600, color: "#1D1D1D",
         margin: "0 0 4px", lineHeight: 1, letterSpacing: "-0.02em",
       }}>
         {typeof value === "number"
@@ -74,7 +70,7 @@ const StatCard = memo(({ value, label, suffix = "", index }) => {
           : value}
       </p>
       <p style={{
-        fontSize: "12px", color: "#888", margin: 0,
+        fontSize: "11px", color: "#888", margin: 0,
         textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: 500,
       }}>
         {label}
@@ -82,10 +78,8 @@ const StatCard = memo(({ value, label, suffix = "", index }) => {
     </motion.div>
   );
 });
-
 StatCard.displayName = "StatCard";
 
-// Memoized — items list is stable per experience entry
 const ResponsibilityGroup = memo(({ title, items, groupIndex, parentInView }) => (
   <div>
     <motion.p
@@ -114,7 +108,6 @@ const ResponsibilityGroup = memo(({ title, items, groupIndex, parentInView }) =>
   </div>
 ));
 
-// Stable style objects — defined once, not recreated per render
 const dotStyle = {
   width: "9px", height: "9px", borderRadius: "50%",
   background: "#3F6B57", border: "2px solid #F7F3EE",
@@ -140,18 +133,17 @@ function ExperienceCard({ exp, index, totalCount }) {
   const cardInView = useInView(cardRef, { once: true, margin: "-80px" });
   const isLast = index === totalCount - 1;
 
-  // Stable handlers — won't cause motion re-renders
   const handleMouseEnter = (e) => { e.currentTarget.style.background = "#3F6B57"; };
   const handleMouseLeave = (e) => { e.currentTarget.style.background = "#1D1D1D"; };
   const handleNavigate = () => navigate(`/experience/${exp.slug}`);
 
-  const statsColumns = `repeat(${Math.min(exp.stats.length, 4)}, 1fr)`;
+  const statsCount = Math.min(exp.stats.length, 4);
 
   return (
-    <div ref={cardRef} style={{ display: "flex", gap: "32px", alignItems: "flex-start" }}>
+    <div ref={cardRef} style={{ display: "flex", gap: "20px", alignItems: "flex-start" }}>
       <div style={{
         display: "flex", flexDirection: "column", alignItems: "center",
-        flexShrink: 0, width: "20px", paddingTop: "4px",
+        flexShrink: 0, width: "16px", paddingTop: "4px",
       }}>
         <motion.div
           initial={{ scale: 0, opacity: 0 }}
@@ -169,14 +161,14 @@ function ExperienceCard({ exp, index, totalCount }) {
         )}
       </div>
 
-      <div style={{ flex: 1, minWidth: 0, paddingBottom: isLast ? 0 : "56px" }}>
+      <div style={{ flex: 1, minWidth: 0, paddingBottom: isLast ? 0 : "48px" }}>
         <motion.span
           initial={{ opacity: 0 }}
           animate={cardInView ? { opacity: 1 } : {}}
           transition={{ duration: 0.4 }}
           style={{
             fontSize: "11px", fontWeight: 600, color: "#888",
-            letterSpacing: "0.1em", display: "block", marginBottom: "16px",
+            letterSpacing: "0.1em", display: "block", marginBottom: "12px",
           }}
         >
           {exp.year}
@@ -186,18 +178,18 @@ function ExperienceCard({ exp, index, totalCount }) {
           initial={{ opacity: 0, y: 20 }}
           animate={cardInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6, delay: 0.1, ease: SPRING_EASE }}
-          style={{ marginBottom: "24px" }}
+          style={{ marginBottom: "20px" }}
         >
           <p style={{ fontSize: "12px", color: "#3F6B57", margin: "0 0 6px", fontWeight: 600, letterSpacing: "0.05em" }}>
             {exp.period}
           </p>
-          <h3 style={{ fontSize: "22px", fontWeight: 600, color: "#1D1D1D", margin: "0 0 4px", letterSpacing: "-0.02em" }}>
+          <h3 style={{ fontSize: "clamp(18px, 4vw, 22px)", fontWeight: 600, color: "#1D1D1D", margin: "0 0 4px", letterSpacing: "-0.02em" }}>
             {exp.role}
           </h3>
-          <p style={{ fontSize: "14px", color: "#888", margin: "0 0 14px", fontWeight: 500 }}>
+          <p style={{ fontSize: "14px", color: "#888", margin: "0 0 12px", fontWeight: 500 }}>
             {exp.company}
           </p>
-          <div style={{ height: "1px", background: "#DDD7C8", margin: "16px 0" }} />
+          <div style={{ height: "1px", background: "#DDD7C8", margin: "14px 0" }} />
           <motion.p
             initial={{ opacity: 0 }}
             animate={cardInView ? { opacity: 1 } : {}}
@@ -212,7 +204,7 @@ function ExperienceCard({ exp, index, totalCount }) {
           initial={{ opacity: 0, y: 12 }}
           animate={cardInView ? { opacity: 1, y: 0 } : {}}
           transition={{ delay: 0.25, duration: 0.5 }}
-          style={{ display: "flex", flexDirection: "column", gap: "20px", marginBottom: "28px" }}
+          style={{ display: "flex", flexDirection: "column", gap: "20px", marginBottom: "24px" }}
         >
           {exp.responsibilities.map((group, i) => (
             <ResponsibilityGroup
@@ -225,20 +217,25 @@ function ExperienceCard({ exp, index, totalCount }) {
           ))}
         </motion.div>
 
-        <div style={{ height: "1px", background: "#DDD7C8", margin: "0 0 24px" }} />
+        <div style={{ height: "1px", background: "#DDD7C8", margin: "0 0 20px" }} />
 
         <div
           className="stats-grid"
-          style={{ display: "grid", gridTemplateColumns: statsColumns, gap: "20px 16px", marginBottom: "32px" }}
+          style={{
+            display: "grid",
+            gridTemplateColumns: `repeat(${statsCount}, 1fr)`,
+            gap: "16px",
+            marginBottom: "28px",
+          }}
         >
           {exp.stats.map((s, i) => (
             <StatCard key={s.label} value={s.value} label={s.label} suffix={s.suffix || ""} index={i} />
           ))}
         </div>
 
-        <div style={{ height: "1px", background: "#DDD7C8", margin: "0 0 24px" }} />
+        <div style={{ height: "1px", background: "#DDD7C8", margin: "0 0 20px" }} />
 
-        <div style={{ display: "flex", alignItems: "center", gap: "24px", flexWrap: "wrap" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap" }}>
           {exp.website && (
             <motion.a
               href={exp.website}
@@ -248,7 +245,7 @@ function ExperienceCard({ exp, index, totalCount }) {
               animate={cardInView ? { opacity: 1 } : {}}
               transition={{ delay: 0.55, duration: 0.5 }}
               whileHover="hover"
-              style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "13px", color: "#888", textDecoration: "none", fontWeight: 500, letterSpacing: "0.01em" }}
+              style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontSize: "13px", color: "#888", textDecoration: "none", fontWeight: 500 }}
             >
               <motion.span variants={{ hover: { color: "#1D1D1D" } }} style={{ transition: "color 0.2s" }}>
                 {exp.websiteLabel}
@@ -279,14 +276,46 @@ function ExperienceCard({ exp, index, totalCount }) {
 }
 
 const EXPERIENCE_STYLES = `
-  @media (max-width: 768px) {
-    .experience-grid { grid-template-columns: 1fr !important; gap: 48px 0 !important; }
-    .experience-grid > div:first-child { position: static !important; }
-    .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  .experience-layout {
+    display: grid;
+    grid-template-columns: 35% 1fr;
+    gap: 0 64px;
+    align-items: start;
   }
+  .experience-header {
+    position: sticky;
+    top: 100px;
+  }
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  @media (min-width: 768px) {
+    .stats-grid {
+      grid-template-columns: repeat(var(--stats-count, 2), 1fr) !important;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .experience-layout {
+      grid-template-columns: 1fr !important;
+      gap: 0 !important;
+    }
+    .experience-header {
+      position: static !important;
+      margin-bottom: 40px;
+    }
+    .stats-grid {
+      grid-template-columns: repeat(2, 1fr) !important;
+    }
+  }
+
   @media (max-width: 480px) {
-    .stats-grid { grid-template-columns: 1fr 1fr !important; }
+    .stats-grid {
+      grid-template-columns: 1fr 1fr !important;
+    }
   }
+
   @media (prefers-reduced-motion: reduce) {
     * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
   }
@@ -308,22 +337,16 @@ export default function Experience() {
       id="experience"
       style={{
         background: "#F7F3EE", minHeight: "100vh",
-        padding: "100px 5vw 120px", boxSizing: "border-box",
+        padding: "clamp(60px, 10vw, 100px) clamp(16px, 5vw, 5vw) clamp(80px, 12vw, 120px)",
+        boxSizing: "border-box",
       }}
     >
-      {/* Injected securely */}
       <style dangerouslySetInnerHTML={{ __html: EXPERIENCE_STYLES }} />
 
-      <div
-        className="experience-grid"
-        style={{
-          maxWidth: "1140px", margin: "0 auto",
-          display: "grid", gridTemplateColumns: "35% 1fr",
-          gap: "0 64px", alignItems: "start",
-        }}
-      >
-        {/* Sticky left header */}
-        <div style={{ position: "sticky", top: "100px" }}>
+      <div className="experience-layout" style={{ maxWidth: "1140px", margin: "0 auto" }}>
+
+        {/* Left header — sticky on desktop, static on mobile */}
+        <div className="experience-header">
           <motion.p
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -339,7 +362,7 @@ export default function Experience() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1, duration: 0.6, ease: SPRING_EASE }}
-            style={{ fontSize: "clamp(32px, 4vw, 48px)", fontWeight: 600, color: "#1D1D1D", margin: "0 0 20px", lineHeight: 1.1, letterSpacing: "-0.03em" }}
+            style={{ fontSize: "clamp(28px, 5vw, 48px)", fontWeight: 600, color: "#1D1D1D", margin: "0 0 16px", lineHeight: 1.1, letterSpacing: "-0.03em" }}
           >
             Professional
             <br />Experience
@@ -360,7 +383,7 @@ export default function Experience() {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ delay: 0.4, duration: 0.5 }}
-            style={{ fontSize: "12px", color: "#AAA", margin: "32px 0 0", letterSpacing: "0.05em", fontWeight: 500 }}
+            style={{ fontSize: "12px", color: "#AAA", margin: "24px 0 0", letterSpacing: "0.05em", fontWeight: 500 }}
           >
             {experiences.length} {experiences.length === 1 ? "position" : "positions"}
           </motion.p>
@@ -369,7 +392,7 @@ export default function Experience() {
         {/* Timeline */}
         <div style={{ position: "relative" }}>
           <div style={{
-            position: "absolute", left: "9px", top: "20px",
+            position: "absolute", left: "7px", top: "20px",
             width: "1px", height: "calc(100% - 40px)", background: "#DDD7C8",
           }}>
             <motion.div style={{
