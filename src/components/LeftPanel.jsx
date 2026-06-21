@@ -1,6 +1,42 @@
+import { memo } from "react";
 import { FaGithub, FaLinkedin, FaEnvelope } from "react-icons/fa";
 import MagneticButton from "./feature/MagneticButton";
 import Stagerred from "./feature/Stagerred";
+
+// Extracted so it doesn't re-render with parent
+const SocialLinks = memo(() => (
+  <div className="flex justify-center lg:justify-start gap-5 text-xl text-gray-700 mt-2 pt-4">
+    <a
+      href="https://github.com/AnthonyNelsonSelvan"
+      target="_blank"
+      rel="noreferrer noopener"
+      aria-label="GitHub"
+      className="hover:text-black transition-colors"
+    >
+      <FaGithub />
+    </a>
+    
+    <a
+      href="https://linkedin.com/in/anthony-nelson-108b35343"
+      target="_blank"
+      rel="noreferrer noopener"
+      aria-label="LinkedIn"
+      className="hover:text-blue-600 transition-colors"
+    >
+      <FaLinkedin />
+    </a>
+    
+    <a
+      href="mailto:anthony@anthonynelson.in"
+      aria-label="Email"
+      className="hover:text-red-500 transition-colors"
+    >
+      <FaEnvelope />
+    </a>
+  </div>
+));
+
+SocialLinks.displayName = "SocialLinks";
 
 const LeftPanel = () => {
   return (
@@ -9,8 +45,15 @@ const LeftPanel = () => {
         <div className="w-full flex justify-center lg:justify-start">
           <img
             src="/me.jpg"
-            alt="Portfolio Portrait"
-            className="w-full max-w-65 lg:max-w-[200x] lg:max-h-[310px] rounded-2xl object-cover shadow-sm transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10 hover:scale-[1.01]"
+            alt="Portrait of Anthony Nelson"
+            // Explicit dimensions prevent layout shift (CLS)
+            width={200}
+            height={310}
+            // This image is above the fold — prioritise it
+            fetchPriority="high"
+            loading="eager"
+            decoding="async"
+            className="w-full max-w-65 lg:max-w-[200px] lg:max-h-77.5 rounded-2xl object-cover shadow-sm transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10 hover:scale-[1.01]"
           />
         </div>
 
@@ -28,55 +71,35 @@ const LeftPanel = () => {
           </h2>
 
           <p className="text-gray-600 max-w-sm leading-relaxed text-sm md:text-base">
-            I'm a backend focused full-stack developer who enjoys building
+            I'm a backend-focused full-stack developer who enjoys building
             scalable systems, designing robust APIs, and turning complex ideas
             into reliable software.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 mt-2">
             <MagneticButton>
-              <button onClick={() => window.location.href = 'mailto:anthony@anthonynelson.in'} className="border border-black px-4 py-2 text-sm font-medium rounded-full hover:bg-black hover:text-white transition-all duration-200">
+              <a
+                href="mailto:anthony@anthonynelson.in"
+                className="border border-black px-4 py-2 text-sm font-medium rounded-full hover:bg-black hover:text-white transition-all duration-200"
+              >
                 Reach me
-              </button>
+              </a>
             </MagneticButton>
 
             <MagneticButton>
-              <button className="border border-black px-4 py-2 text-sm font-medium rounded-full hover:bg-black hover:text-white transition-all duration-200">
-                <a href="/Anthony_Nelson_CV.pdf" download={true}>
+              <a
+                href="/Anthony_Nelson_CV.pdf"
+                download
+                className="border border-black px-4 py-2 text-sm font-medium rounded-full hover:bg-black hover:text-white transition-all duration-200"
+              >
                 Download CV
-                </a>
-              </button>
+              </a>
             </MagneticButton>
           </div>
         </div>
       </Stagerred>
 
-      <div className="flex justify-center lg:justify-start gap-5 text-xl text-gray-700 mt-2 pt-4">
-        <a
-          href="https://github.com/AnthonyNelsonSelvan"
-          target="_blank"
-          rel="noreferrer"
-          className="hover:text-black transition-colors"
-        >
-          <FaGithub />
-        </a>
-
-        <a
-          href="https://linkedin.com/in/anthony-nelson-108b35343"
-          target="_blank"
-          rel="noreferrer"
-          className="hover:text-blue-600 transition-colors"
-        >
-          <FaLinkedin />
-        </a>
-
-        <a
-          href="mailto:anthony@anthonynelson.in"
-          className="hover:text-red-500 transition-colors"
-        >
-          <FaEnvelope />
-        </a>
-      </div>
+      <SocialLinks />
     </div>
   );
 };

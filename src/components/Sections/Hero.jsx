@@ -1,47 +1,72 @@
 import React, { useEffect, useRef } from "react";
 
+// Static: defined once at module level, not recreated on every render
+const TECH_STACK = ["Node.js", "Express", "MongoDB", "React"];
+
+// Injected safely using dangerouslySetInnerHTML to prevent React parser bugs
+const HERO_STYLES = `
+  @media (prefers-reduced-motion: no-preference) {
+    [data-animate-scale] {
+      opacity: 0;
+      transform: scale(0.96);
+      transition: opacity 0.9s ease, transform 0.9s ease;
+    }
+    [data-animate-scale].animate-in {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  /* Immediately visible for users who prefer reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    [data-animate-scale] {
+      opacity: 1;
+      transform: none;
+    }
+  }
+`;
+
 const Hero = () => {
   const heroRef = useRef(null);
 
   useEffect(() => {
-    const elements = heroRef.current?.querySelectorAll("[data-animate-scale]");
+    const section = heroRef.current;
+    if (!section) return;
 
+    const elements = section.querySelectorAll("[data-animate-scale]");
+    if (!elements.length) return;
+
+    // Single observer instance, not recreated per element
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.classList.add("animate-in");
+            // Unobserve immediately — no need to keep watching
             observer.unobserve(entry.target);
           }
         });
       },
-      { threshold: 0.15 }
+      { threshold: 0.15, rootMargin: "0px" }
     );
 
-    elements?.forEach((el) => observer.observe(el));
+    elements.forEach((el) => observer.observe(el));
+
+    // Cleanup disconnects all observations
     return () => observer.disconnect();
-  }, []);
+  }, []); // Empty dep array is correct — heroRef.current is stable after mount
 
   return (
     <section
       id="hero"
       ref={heroRef}
-      className="min-h-screen flex items-center px-6 md:px-10 lg:px-20 lg:-translate-y-10"
+      // Avoid CSS transform on section — forces unnecessary compositor layer.
+      // Use padding/margin instead to push content down.
+      className="min-h-screen flex items-center px-6 md:px-10 lg:px-20 lg:mb-10"
     >
-      <style>{`
-        [data-animate-scale] {
-          opacity: 0;
-          transform: scale(0.96);
-          transition: opacity 0.9s ease, transform 0.9s ease;
-        }
-        [data-animate-scale].animate-in {
-          opacity: 1;
-          transform: scale(1);
-        }
-      `}</style>
+      {/* Style injected once securely */}
+      <style dangerouslySetInnerHTML={{ __html: HERO_STYLES }} />
 
       <div className="max-w-4xl text-center lg:text-left">
-
         <h1
           data-animate-scale
           style={{ transitionDelay: "0ms" }}
@@ -68,7 +93,7 @@ const Hero = () => {
           style={{ transitionDelay: "280ms" }}
           className="flex flex-wrap justify-center lg:justify-start gap-3 mt-10"
         >
-          {["Node.js", "Express", "Docker", "MongoDB", "React"].map((tech) => (
+          {TECH_STACK.map((tech) => (
             <span
               key={tech}
               className="px-5 py-2 rounded-full bg-[#ECE9E1] border border-[#DDD7C8]"
@@ -77,7 +102,6 @@ const Hero = () => {
             </span>
           ))}
         </div>
-
       </div>
     </section>
   );

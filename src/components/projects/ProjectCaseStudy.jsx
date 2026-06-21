@@ -1,9 +1,9 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, memo, useCallback } from "react";
 import { motion, useInView } from "framer-motion";
 import { useParams, useNavigate } from "react-router-dom";
 import { projects } from "../../data/detailed";
 
-// ─── Palette ──────────────────────────────────────────────────────────────────
+// ─── Palette (module-level — never recreated) ──────────────────────────────
 const C = {
   bg:      "#F7F3EE",
   heading: "#1D1D1D",
@@ -13,21 +13,53 @@ const C = {
   pill:    "#F0EBE1",
 };
 
-// ─── Pill ─────────────────────────────────────────────────────────────────────
-function Pill({ label }) {
-  return (
-    <span style={{
-      display: "inline-block", padding: "4px 12px", borderRadius: "999px",
-      border: `1px solid ${C.border}`, fontSize: "12px", color: C.accent,
-      background: C.pill, fontWeight: 500, letterSpacing: "0.02em", whiteSpace: "nowrap",
-    }}>
-      {label}
-    </span>
-  );
-}
+// ─── Shared easing curve ───────────────────────────────────────────────────
+const EASE = [0.16, 1, 0.3, 1];
 
-// ─── Section wrapper ──────────────────────────────────────────────────────────
-function Section({ children, style = {} }) {
+// ─── Static style objects (module-level — zero GC pressure) ───────────────
+const pillStyle = {
+  display: "inline-block", padding: "4px 12px", borderRadius: "999px",
+  border: `1px solid ${C.border}`, fontSize: "12px", color: C.accent,
+  background: C.pill, fontWeight: 500, letterSpacing: "0.02em", whiteSpace: "nowrap",
+};
+
+const sectionLabelStyle = {
+  fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.14em",
+  color: C.accent, fontWeight: 600, margin: "0 0 10px",
+};
+
+const sectionHeadingStyle = {
+  fontSize: "clamp(24px, 3vw, 36px)", fontWeight: 600, color: C.heading,
+  margin: 0, letterSpacing: "-0.025em", lineHeight: 1.15,
+};
+
+const RESPONSIVE_STYLES = `
+  .status-strip > div:last-child { border-right: none !important; }
+  @media (max-width: 900px) {
+    .overview-stats { grid-template-columns: repeat(2,1fr) !important; }
+    .tech-grid      { grid-template-columns: repeat(2,1fr) !important; }
+  }
+  @media (max-width: 640px) {
+    .status-strip > div { border-right: none !important; border-bottom: 1px solid ${C.border}; }
+    .status-strip > div:last-child { border-bottom: none !important; }
+    .features-grid     { grid-template-columns: 1fr !important; }
+    .screenshots-grid  { grid-template-columns: 1fr !important; }
+    .overview-stats    { grid-template-columns: 1fr 1fr !important; }
+    .tech-grid         { grid-template-columns: 1fr 1fr !important; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+`;
+
+// ─── Pill ──────────────────────────────────────────────────────────────────
+const Pill = memo(({ label }) => (
+  <span style={pillStyle}>{label}</span>
+));
+Pill.displayName = "Pill";
+
+// ─── Section wrapper ───────────────────────────────────────────────────────
+const Section = memo(({ children, style = {} }) => {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-60px" });
   return (
@@ -35,46 +67,34 @@ function Section({ children, style = {} }) {
       ref={ref}
       initial={{ opacity: 0, y: 24 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration: 0.6, ease: EASE }}
       style={{ marginBottom: "96px", ...style }}
     >
       {children}
     </motion.div>
   );
-}
+});
+Section.displayName = "Section";
 
-// ─── Section label + heading ──────────────────────────────────────────────────
-function SectionHeader({ label, heading }) {
-  return (
-    <div style={{ marginBottom: "36px" }}>
-      <p style={{
-        fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.14em",
-        color: C.accent, fontWeight: 600, margin: "0 0 10px",
-      }}>
-        {label}
-      </p>
-      <h2 style={{
-        fontSize: "clamp(24px, 3vw, 36px)", fontWeight: 600, color: C.heading,
-        margin: 0, letterSpacing: "-0.025em", lineHeight: 1.15,
-      }}>
-        {heading}
-      </h2>
-    </div>
-  );
-}
+// ─── Section label + heading ───────────────────────────────────────────────
+const SectionHeader = memo(({ label, heading }) => (
+  <div style={{ marginBottom: "36px" }}>
+    <p style={sectionLabelStyle}>{label}</p>
+    <h2 style={sectionHeadingStyle}>{heading}</h2>
+  </div>
+));
+SectionHeader.displayName = "SectionHeader";
 
-// ─── Architecture animation ───────────────────────────────────────────────────
+// ─── Architecture animation ────────────────────────────────────────────────
 function Architecture({ steps }) {
   const [active, setActive] = useState(-1);
   const [running, setRunning] = useState(false);
-  const ref = useRef(null);
-  useInView(ref, { once: false, margin: "-80px" });
 
-  const run = () => {
+  const run = useCallback(() => {
     if (running) return;
     setRunning(true);
     setActive(0);
-  };
+  }, [running]);
 
   useEffect(() => {
     if (active < 0 || !running) return;
@@ -86,14 +106,19 @@ function Architecture({ steps }) {
     return () => clearTimeout(t);
   }, [active, running, steps.length]);
 
+  const btnLabel = running
+    ? "Running…"
+    : active >= steps.length
+    ? "Run Again →"
+    : "Start Architecture →";
+
   return (
-    <div ref={ref} style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
       <motion.button
         onClick={run}
         whileHover={{ backgroundColor: running ? C.border : C.accent, color: running ? C.muted : "#F7F3EE" }}
         style={{
-          marginBottom: "40px",
-          padding: "10px 24px", borderRadius: "7px",
+          marginBottom: "40px", padding: "10px 24px", borderRadius: "7px",
           border: `1px solid ${C.border}`,
           background: running ? C.pill : C.heading,
           color: running ? C.muted : C.bg,
@@ -103,7 +128,7 @@ function Architecture({ steps }) {
           letterSpacing: "0.01em",
         }}
       >
-        {running ? "Running…" : active >= steps.length ? "Run Again →" : "Start Architecture →"}
+        {btnLabel}
       </motion.button>
 
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 0, width: "100%", maxWidth: "360px" }}>
@@ -115,16 +140,15 @@ function Architecture({ steps }) {
             <div key={step.id} style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
               <motion.div
                 animate={{
-                  borderColor: isActive ? C.accent : isDone ? "#A8C5B5" : C.border,
+                  borderColor:     isActive ? C.accent : isDone ? "#A8C5B5" : C.border,
                   backgroundColor: isActive ? "#EAF2EE" : isDone ? "#F4FAF7" : C.bg,
                   scale: isActive ? 1.04 : 1,
                 }}
                 transition={{ duration: 0.25 }}
                 style={{
-                  width: "100%", padding: "14px 20px",
-                  borderRadius: "8px", border: `1.5px solid ${C.border}`,
-                  display: "flex", alignItems: "center", justifyContent: "space-between",
-                  gap: "12px",
+                  width: "100%", padding: "14px 20px", borderRadius: "8px",
+                  border: `1.5px solid ${C.border}`,
+                  display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px",
                 }}
               >
                 <div>
@@ -178,60 +202,61 @@ function Architecture({ steps }) {
   );
 }
 
-// ─── Screenshot card (used in the grid section) ───────────────────────────────
-function ScreenshotCard({ screenshot, index, parentInView }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={parentInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ delay: index * 0.1, duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
-      style={{ borderRadius: "10px", overflow: "hidden", border: `1px solid ${C.border}` }}
-    >
-      {screenshot.src ? (
-        <img
-          src={screenshot.src}
-          alt={screenshot.alt}
-          style={{ width: "100%", display: "block", objectFit: "cover" }}
-        />
-      ) : (
-        <div style={{
-          width: "100%", aspectRatio: "16/9",
-          background: C.pill, display: "flex",
-          flexDirection: "column", alignItems: "center", justifyContent: "center",
-          gap: "8px",
-        }}>
-          <span style={{ fontSize: "22px", opacity: 0.4 }}>🖼</span>
-          <span style={{ fontSize: "12px", color: C.muted, fontWeight: 500 }}>
-            {screenshot.label}
-          </span>
-        </div>
-      )}
-      <div style={{ padding: "12px 16px", borderTop: `1px solid ${C.border}` }}>
-        <p style={{ margin: 0, fontSize: "12px", color: C.muted, fontWeight: 500 }}>
+// ─── Screenshot card ───────────────────────────────────────────────────────
+const ScreenshotCard = memo(({ screenshot, index, parentInView }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={parentInView ? { opacity: 1, y: 0 } : {}}
+    transition={{ delay: index * 0.1, duration: 0.55, ease: EASE }}
+    style={{ borderRadius: "10px", overflow: "hidden", border: `1px solid ${C.border}` }}
+  >
+    {screenshot.src ? (
+      <img
+        src={screenshot.src}
+        alt={screenshot.alt}
+        loading="lazy"
+        decoding="async"
+        style={{ width: "100%", display: "block", objectFit: "cover" }}
+      />
+    ) : (
+      <div style={{
+        width: "100%", aspectRatio: "16/9", background: C.pill,
+        display: "flex", flexDirection: "column", alignItems: "center",
+        justifyContent: "center", gap: "8px",
+      }}>
+        <span style={{ fontSize: "22px", opacity: 0.4 }}>🖼</span>
+        <span style={{ fontSize: "12px", color: C.muted, fontWeight: 500 }}>
           {screenshot.label}
-        </p>
+        </span>
       </div>
-    </motion.div>
-  );
-}
+    )}
+    <div style={{ padding: "12px 16px", borderTop: `1px solid ${C.border}` }}>
+      <p style={{ margin: 0, fontSize: "12px", color: C.muted, fontWeight: 500 }}>
+        {screenshot.label}
+      </p>
+    </div>
+  </motion.div>
+));
+ScreenshotCard.displayName = "ScreenshotCard";
 
-// ─── Hero Screenshot Gallery ──────────────────────────────────────────────────
+// ─── Hero Screenshot Gallery ───────────────────────────────────────────────
 function HeroGallery({ screenshots }) {
   const [active, setActive] = useState(0);
   const current = screenshots[active];
+
+  const handleThumbClick = useCallback((i) => setActive(i), []);
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 32 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.4, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ delay: 0.4, duration: 0.7, ease: EASE }}
       style={{ width: "100%", marginBottom: "96px" }}
     >
       {/* Main image */}
       <div style={{
-        width: "100%", aspectRatio: "16/8",
-        background: C.pill, borderRadius: "12px",
-        border: `1px solid ${C.border}`,
+        width: "100%", aspectRatio: "16/8", background: C.pill,
+        borderRadius: "12px", border: `1px solid ${C.border}`,
         overflow: "hidden", marginBottom: "10px",
       }}>
         <motion.img
@@ -241,6 +266,9 @@ function HeroGallery({ screenshots }) {
           transition={{ duration: 0.25 }}
           src={current.src}
           alt={current.alt}
+          loading="eager"
+          fetchPriority="high"
+          decoding="async"
           style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
         />
       </div>
@@ -248,15 +276,17 @@ function HeroGallery({ screenshots }) {
       {/* Thumbnails */}
       <div style={{ display: "flex", gap: "8px" }}>
         {screenshots.map((shot, i) => (
-          <div key={i} style={{ flex: 1 }}>
+          <div key={shot.src ?? i} style={{ flex: 1 }}>
             <div
-              onClick={() => setActive(i)}
+              onClick={() => handleThumbClick(i)}
+              role="button"
+              tabIndex={0}
+              aria-label={shot.label}
+              onKeyDown={(e) => e.key === "Enter" && handleThumbClick(i)}
               style={{
-                aspectRatio: "16/9",
-                borderRadius: "8px",
+                aspectRatio: "16/9", borderRadius: "8px",
                 border: `1px solid ${i === active ? C.accent : C.border}`,
-                overflow: "hidden",
-                cursor: "pointer",
+                overflow: "hidden", cursor: "pointer",
                 opacity: i === active ? 1 : 0.5,
                 transition: "opacity 0.15s, border-color 0.15s",
               }}
@@ -264,11 +294,14 @@ function HeroGallery({ screenshots }) {
               <img
                 src={shot.src}
                 alt={shot.label}
+                loading="lazy"
+                decoding="async"
                 style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
               />
             </div>
             <p style={{
-              fontSize: "11px", color: i === active ? C.heading : C.muted,
+              fontSize: "11px",
+              color: i === active ? C.heading : C.muted,
               textAlign: "center", margin: "5px 0 0",
               fontWeight: i === active ? 600 : 400,
               transition: "color 0.15s",
@@ -282,21 +315,46 @@ function HeroGallery({ screenshots }) {
   );
 }
 
-// ─── Main page ────────────────────────────────────────────────────────────────
-export default function ProjectCaseStudy() {
-  const { slug } = useParams();
-  const navigate = useNavigate();
-  const project  = projects.find((p) => p.slug === slug);
+// ─── Stable hover handlers (module-level) ──────────────────────────────────
+const onBackEnter  = (e) => { e.currentTarget.style.color = C.heading; };
+const onBackLeave  = (e) => { e.currentTarget.style.color = C.muted; };
+const onLiveEnter  = (e) => { e.currentTarget.style.background = C.accent; };
+const onLiveLeave  = (e) => { e.currentTarget.style.background = C.heading; };
+const onGhEnter    = (e) => { e.currentTarget.style.borderColor = C.accent; e.currentTarget.style.color = C.accent; };
+const onGhLeave    = (e) => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.color = C.heading; };
 
-  const screenshotsRef = useRef(null);
+// ─── Status strip items ────────────────────────────────────────────────────
+const getStatusItems = (project) => [
+  { label: "Status",   value: project.status   },
+  { label: "Role",     value: project.role     },
+  { label: "Duration", value: project.duration },
+  { label: "Focus",    value: project.focus    },
+];
+
+// ─── Main page ─────────────────────────────────────────────────────────────
+export default function ProjectCaseStudy() {
+  const { slug }   = useParams();
+  const navigate   = useNavigate();
+  const project    = projects.find((p) => p.slug === slug);
+
+  const screenshotsRef    = useRef(null);
   const screenshotsInView = useInView(screenshotsRef, { once: true, margin: "-60px" });
+
+  const goBack        = useCallback(() => navigate(-1), [navigate]);
+  const goNextProject = useCallback(
+    () => navigate(`/projects/${project?.nextProject}`),
+    [navigate, project?.nextProject]
+  );
 
   if (!project) {
     return (
       <div style={{ background: C.bg, minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <div style={{ textAlign: "center" }}>
           <p style={{ color: C.muted, fontSize: "14px", marginBottom: "16px" }}>Project not found.</p>
-          <button onClick={() => navigate(-1)} style={{ color: C.accent, background: "none", border: "none", cursor: "pointer", fontSize: "14px", fontWeight: 500 }}>
+          <button
+            onClick={goBack}
+            style={{ color: C.accent, background: "none", border: "none", cursor: "pointer", fontSize: "14px", fontWeight: 500 }}
+          >
             ← Go back
           </button>
         </div>
@@ -304,8 +362,11 @@ export default function ProjectCaseStudy() {
     );
   }
 
+  const statusItems = getStatusItems(project);
+
   return (
     <div style={{ background: C.bg, minHeight: "100vh" }}>
+      <style dangerouslySetInnerHTML={{ __html: RESPONSIVE_STYLES }} />
 
       {/* ── Hero ──────────────────────────────────────────────────── */}
       <div style={{ padding: "80px 5vw 0", maxWidth: "1140px", margin: "0 auto" }}>
@@ -315,18 +376,17 @@ export default function ProjectCaseStudy() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.4 }}
-          onClick={() => navigate(-1)}
+          onClick={goBack}
+          onMouseEnter={onBackEnter}
+          onMouseLeave={onBackLeave}
           style={{
             display: "inline-flex", alignItems: "center", gap: "6px",
             background: "none", border: "none", cursor: "pointer",
             color: C.muted, fontSize: "13px", fontWeight: 500,
-            marginBottom: "48px", padding: 0,
-            transition: "color 0.2s",
+            marginBottom: "48px", padding: 0, transition: "color 0.2s",
           }}
-          onMouseEnter={e => e.currentTarget.style.color = C.heading}
-          onMouseLeave={e => e.currentTarget.style.color = C.muted}
         >
-          ← Back
+          &larr; Back
         </motion.button>
 
         {/* Status strip */}
@@ -342,17 +402,12 @@ export default function ProjectCaseStudy() {
           }}
           className="status-strip"
         >
-          {[
-            { label: "Status",   value: project.status },
-            { label: "Role",     value: project.role },
-            { label: "Duration", value: project.duration },
-            { label: "Focus",    value: project.focus },
-          ].map((item, i) => (
+          {statusItems.map((item, i) => (
             <div
               key={item.label}
               style={{
                 padding: "14px 24px",
-                borderRight: i < 3 ? `1px solid ${C.border}` : "none",
+                borderRight: i < statusItems.length - 1 ? `1px solid ${C.border}` : "none",
                 flex: "1 1 160px",
               }}
             >
@@ -366,7 +421,7 @@ export default function ProjectCaseStudy() {
           ))}
         </motion.div>
 
-        {/* Title */}
+        {/* Title block */}
         <motion.p
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
@@ -379,11 +434,10 @@ export default function ProjectCaseStudy() {
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ delay: 0.15, duration: 0.7, ease: EASE }}
           style={{
             fontSize: "clamp(36px, 6vw, 72px)", fontWeight: 600, color: C.heading,
-            margin: "0 0 20px", letterSpacing: "-0.035em", lineHeight: 1.05,
-            maxWidth: "800px",
+            margin: "0 0 20px", letterSpacing: "-0.035em", lineHeight: 1.05, maxWidth: "800px",
           }}
         >
           {project.title}
@@ -407,22 +461,28 @@ export default function ProjectCaseStudy() {
         >
           {project.liveUrl && (
             <a
-              href={project.liveUrl} target="_blank" rel="noopener noreferrer"
+              href={project.liveUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onMouseEnter={onLiveEnter}
+              onMouseLeave={onLiveLeave}
               style={{
                 display: "inline-flex", alignItems: "center", gap: "6px",
                 background: C.heading, color: C.bg, padding: "11px 22px",
                 borderRadius: "7px", fontSize: "13px", fontWeight: 500,
                 textDecoration: "none", transition: "background 0.2s",
               }}
-              onMouseEnter={e => e.currentTarget.style.background = C.accent}
-              onMouseLeave={e => e.currentTarget.style.background = C.heading}
             >
-              Live Demo →
+              Live Demo &rarr;
             </a>
           )}
           {project.githubUrl && (
             <a
-              href={project.githubUrl} target="_blank" rel="noopener noreferrer"
+              href={project.githubUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onMouseEnter={onGhEnter}
+              onMouseLeave={onGhLeave}
               style={{
                 display: "inline-flex", alignItems: "center", gap: "6px",
                 background: "none", color: C.heading, padding: "11px 22px",
@@ -430,24 +490,20 @@ export default function ProjectCaseStudy() {
                 fontSize: "13px", fontWeight: 500, textDecoration: "none",
                 transition: "border-color 0.2s, color 0.2s",
               }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = C.accent; e.currentTarget.style.color = C.accent; }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.color = C.heading; }}
             >
-              GitHub →
+              GitHub &rarr;
             </a>
           )}
         </motion.div>
 
-        {/* ── Hero Gallery (replaces placeholder) ── */}
         {project.screenshots?.length > 0 && (
           <HeroGallery screenshots={project.screenshots} />
         )}
       </div>
 
-      {/* ── Body sections ──────────────────────────────────────────── */}
+      {/* ── Body sections ─────────────────────────────────────────── */}
       <div style={{ padding: "0 5vw", maxWidth: "1140px", margin: "0 auto" }}>
 
-        {/* Overview */}
         <Section>
           <SectionHeader label="Overview" heading="What is it?" />
           <p style={{ fontSize: "16px", color: "#555", lineHeight: 1.8, maxWidth: "680px", margin: "0 0 40px" }}>
@@ -473,7 +529,6 @@ export default function ProjectCaseStudy() {
           </div>
         </Section>
 
-        {/* Problem */}
         <Section>
           <SectionHeader label="Problem" heading="Why does it exist?" />
           <p style={{ fontSize: "16px", color: "#555", lineHeight: 1.8, maxWidth: "680px", margin: 0 }}>
@@ -481,7 +536,6 @@ export default function ProjectCaseStudy() {
           </p>
         </Section>
 
-        {/* Solution */}
         <Section>
           <SectionHeader label="Solution" heading="What does it do?" />
           <p style={{ fontSize: "16px", color: "#555", lineHeight: 1.8, maxWidth: "680px", margin: 0 }}>
@@ -489,22 +543,17 @@ export default function ProjectCaseStudy() {
           </p>
         </Section>
 
-        {/* Architecture */}
         <Section>
           <SectionHeader label="Architecture" heading="How does it work?" />
           <Architecture steps={project.architecture} />
         </Section>
 
-        {/* Features */}
         <Section>
           <SectionHeader label="Features" heading="What's included?" />
           <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "32px" }} className="features-grid">
             {project.features.map((group) => (
               <div key={group.title}>
-                <p style={{
-                  fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.1em",
-                  color: C.accent, fontWeight: 600, margin: "0 0 12px",
-                }}>
+                <p style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.1em", color: C.accent, fontWeight: 600, margin: "0 0 12px" }}>
                   {group.title}
                 </p>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
@@ -515,7 +564,6 @@ export default function ProjectCaseStudy() {
           </div>
         </Section>
 
-        {/* Screenshots */}
         <Section>
           <SectionHeader label="Screenshots" heading="In the wild." />
           <div
@@ -524,21 +572,22 @@ export default function ProjectCaseStudy() {
             className="screenshots-grid"
           >
             {project.screenshots.map((s, i) => (
-              <ScreenshotCard key={s.label} screenshot={s} index={i} parentInView={screenshotsInView} />
+              <ScreenshotCard
+                key={s.label}
+                screenshot={s}
+                index={i}
+                parentInView={screenshotsInView}
+              />
             ))}
           </div>
         </Section>
 
-        {/* Tech Stack */}
         <Section>
           <SectionHeader label="Tech Stack" heading="Built with." />
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "32px" }} className="tech-grid">
             {project.techStack.map((group) => (
               <div key={group.group}>
-                <p style={{
-                  fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.1em",
-                  color: C.accent, fontWeight: 600, margin: "0 0 12px",
-                }}>
+                <p style={{ fontSize: "11px", textTransform: "uppercase", letterSpacing: "0.1em", color: C.accent, fontWeight: 600, margin: "0 0 12px" }}>
                   {group.group}
                 </p>
                 <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
@@ -553,7 +602,6 @@ export default function ProjectCaseStudy() {
           </div>
         </Section>
 
-        {/* Challenges */}
         <Section>
           <SectionHeader label="Challenges" heading={project.challengeTitle} />
           <p style={{ fontSize: "16px", color: "#555", lineHeight: 1.8, maxWidth: "680px", margin: 0 }}>
@@ -561,7 +609,6 @@ export default function ProjectCaseStudy() {
           </p>
         </Section>
 
-        {/* Learnings */}
         <Section>
           <SectionHeader label="Learnings" heading="What I took away." />
           <p style={{ fontSize: "16px", color: "#555", lineHeight: 1.8, maxWidth: "680px", margin: 0 }}>
@@ -569,7 +616,6 @@ export default function ProjectCaseStudy() {
           </p>
         </Section>
 
-        {/* Future */}
         <Section>
           <SectionHeader label="Future" heading="What's next for this project." />
           <div style={{ display: "flex", flexDirection: "column", gap: "12px", maxWidth: "480px" }}>
@@ -589,7 +635,7 @@ export default function ProjectCaseStudy() {
           </div>
         </Section>
 
-        {/* Footer */}
+        {/* Page footer */}
         <div style={{ borderTop: `1px solid ${C.border}`, padding: "48px 0 80px" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "24px" }}>
             <div>
@@ -597,16 +643,20 @@ export default function ProjectCaseStudy() {
                 Interested in the implementation?
               </p>
               {project.githubUrl && (
-                <a href={project.githubUrl} target="_blank" rel="noopener noreferrer"
-                  style={{ fontSize: "14px", color: C.accent, fontWeight: 600, textDecoration: "none" }}>
-                  GitHub →
+                <a
+                  href={project.githubUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ fontSize: "14px", color: C.accent, fontWeight: 600, textDecoration: "none" }}
+                >
+                  GitHub &rarr;
                 </a>
               )}
             </div>
 
             {project.nextProject && (
               <motion.button
-                onClick={() => navigate(`/projects/${project.nextProject}`)}
+                onClick={goNextProject}
                 whileHover={{ color: C.accent }}
                 style={{
                   background: "none", border: "none", cursor: "pointer",
@@ -615,33 +665,17 @@ export default function ProjectCaseStudy() {
                   transition: "color 0.2s",
                 }}
               >
-                <span style={{ fontSize: "10px", textTransform: "uppercase", letterSpacing: "0.1em" }}>Next Project</span>
-                <span style={{ fontSize: "15px", fontWeight: 600, color: C.heading }}>{project.nextProjectLabel} →</span>
+                <span style={{ fontSize: "10px", textTransform: "uppercase", letterSpacing: "0.1em" }}>
+                  Next Project
+                </span>
+                <span style={{ fontSize: "15px", fontWeight: 600, color: C.heading }}>
+                  {project.nextProjectLabel} &rarr;
+                </span>
               </motion.button>
             )}
           </div>
         </div>
       </div>
-
-      {/* ── Responsive ──────────────────────────────────────────────── */}
-      <style>{`
-        .status-strip > div:last-child { border-right: none !important; }
-        @media (max-width: 900px) {
-          .overview-stats { grid-template-columns: repeat(2,1fr) !important; }
-          .tech-grid { grid-template-columns: repeat(2,1fr) !important; }
-        }
-        @media (max-width: 640px) {
-          .status-strip > div { border-right: none !important; border-bottom: 1px solid ${C.border}; }
-          .status-strip > div:last-child { border-bottom: none !important; }
-          .features-grid { grid-template-columns: 1fr !important; }
-          .screenshots-grid { grid-template-columns: 1fr !important; }
-          .overview-stats { grid-template-columns: 1fr 1fr !important; }
-          .tech-grid { grid-template-columns: 1fr 1fr !important; }
-        }
-        @media (prefers-reduced-motion: reduce) {
-          * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
-        }
-      `}</style>
     </div>
   );
 }
