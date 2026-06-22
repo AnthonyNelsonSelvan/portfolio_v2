@@ -101,7 +101,7 @@ const About = () => {
       id="about"
       ref={sectionRef}
       // Replaced -translate-y-12 (forces compositor layer) with negative margin
-      className="min-h-screen px-6 md:px-10 lg:px-20 py-24 flex items-center -mb-12"
+      className="min-h-screen px-6 md:px-10 lg:px-20 py-24 items-center -mb-12 hidden md:block"
     >
       {/* Injected securely */}
       <style dangerouslySetInnerHTML={{ __html: ABOUT_STYLES }} />

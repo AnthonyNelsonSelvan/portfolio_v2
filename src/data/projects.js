@@ -18,12 +18,12 @@ export const projects = [
     ],
   },
   {
-    id: "container-hosting-platform",
-    name: "Container Hosting Platform",
+    id: "container-deployment-platform",
+    name: "Container Deployment Platform",
     description:
       "A platform for deploying and managing containerized applications with support for scalable infrastructure and custom domain integration.",
     image: "/images/host.png",
-    route: "/projects/container-hosting",
+    route: "/projects/container-deployment-platform",
     github: "https://github.com/AnthonyNelsonSelvan/hosting-platform",
   },
 ];
