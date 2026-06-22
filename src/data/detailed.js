@@ -219,11 +219,11 @@ export const projects = [
       },
       {
         group: "Infrastructure",
-        items: ["Docker", "Nginx", "Linux", "tar-fs"],
+        items: ["Docker", "Nginx", "Linux"],
       },
       {
         group: "Utilities",
-        items: ["crypto", "fs/promises", "path", "unzipper"],
+        items: ["crypto", "fs/promises", "path", "unzipper","tar-fs"],
       },
     ],
 
