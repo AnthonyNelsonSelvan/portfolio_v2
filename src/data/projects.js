@@ -2,6 +2,7 @@ export const projects = [
   {
     id: "dns-management-system",
     name: "DNS Management Platform",
+    category: "Infrastructure",
     description:
       "Automates secure DNS provisioning through asynchronous processing and dynamic BIND9 updates.",
     image: "/dnsDash.png",
@@ -20,10 +21,18 @@ export const projects = [
   {
     id: "container-deployment-platform",
     name: "Container Deployment Platform",
+    category: "DevOps",
     description:
       "A platform for deploying and managing containerized applications with support for scalable infrastructure and custom domain integration.",
-    image: "/images/host.png",
+    image: "/containerHost.png",
     route: "/projects/container-deployment-platform",
     github: "https://github.com/AnthonyNelsonSelvan/hosting-platform",
+    tech: [
+      "Node.js",
+      "Express",
+      "MongoDB",
+      "Docker",
+      "Nginx",
+    ],
   },
 ];
