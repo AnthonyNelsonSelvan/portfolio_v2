@@ -1,4 +1,5 @@
-import { memo } from "react";
+import { memo, useRef } from "react";
+import { motion, useInView } from "framer-motion";
 import {
   FaCode, FaCss3Alt, FaDatabase, FaDocker, FaGitAlt,
   FaGithub, FaHtml5, FaJs, FaNodeJs, FaPython,
@@ -80,37 +81,99 @@ const EXPLORING = [
   "Scalable Backend Architecture",
 ];
 
+const SPRING_EASE = [0.16, 1, 0.3, 1];
+
+const chipContainer = {
+  hidden: {},
+  show: {
+    transition: {
+      staggerChildren: 0.05,
+    },
+  },
+};
+
+const chipItem = {
+  hidden: {
+    opacity: 0,
+    scale: 0.8,
+  },
+  show: {
+    opacity: 1,
+    scale: 1,
+    transition: {
+      duration: 0.4,
+      ease: SPRING_EASE,
+    },
+  },
+};
+
 const SkillChip = memo(({ name, icon }) => (
-  <div className="flex items-center gap-2 rounded-full border border-gray-200 bg-[#FAF8F5] px-3 py-2 sm:px-5 sm:py-3 transition-all duration-300 hover:bg-[#2B2B2B] hover:text-white hover:scale-105 cursor-default">
+  <motion.div
+    variants={chipItem}
+    className="flex items-center gap-2 rounded-full border border-gray-200 bg-[#FAF8F5] px-3 py-2 sm:px-5 sm:py-3 transition-all duration-300 hover:bg-[#2B2B2B] hover:text-white hover:scale-105 cursor-default"
+    whileHover={{ scale: 1.05 }}
+  >
     {icon && <span className="text-base sm:text-xl">{icon}</span>}
     <span className="font-medium text-sm sm:text-base">{name}</span>
-  </div>
+  </motion.div>
 ));
 
 SkillChip.displayName = "SkillChip";
 
-const SectionCard = memo(({ title, icon, skills }) => (
-  <div className="rounded-2xl sm:rounded-3xl border border-gray-200 bg-white p-5 sm:p-8 shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
-    <div className="flex items-center gap-2 sm:gap-3 mb-5 sm:mb-8 text-[#8B5E3C]">
-      {icon && <div className="text-2xl sm:text-3xl">{icon}</div>}
-      <h2 className="text-lg sm:text-2xl font-semibold text-black">{title}</h2>
-    </div>
-    <div className="flex flex-wrap gap-2 sm:gap-4">
-      {skills.map((skill) => (
-        <SkillChip key={skill.name} name={skill.name} icon={skill.icon} />
-      ))}
-    </div>
-  </div>
-));
+const cardContainer = {
+  hidden: {},
+  show: {
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const SectionCard = memo(({ title, icon, skills, index }) => {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: "-50px" });
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 30 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.6, delay: index * 0.1, ease: SPRING_EASE }}
+      className="rounded-2xl sm:rounded-3xl border border-gray-200 bg-white p-5 sm:p-8 shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-xl"
+    >
+      <div className="flex items-center gap-2 sm:gap-3 mb-5 sm:mb-8 text-[#8B5E3C]">
+        {icon && <div className="text-2xl sm:text-3xl">{icon}</div>}
+        <h2 className="text-lg sm:text-2xl font-semibold text-black">{title}</h2>
+      </div>
+      <motion.div
+        variants={chipContainer}
+        initial="hidden"
+        animate={inView ? "show" : "hidden"}
+        className="flex flex-wrap gap-2 sm:gap-4"
+      >
+        {skills.map((skill) => (
+          <SkillChip key={skill.name} name={skill.name} icon={skill.icon} />
+        ))}
+      </motion.div>
+    </motion.div>
+  );
+});
 
 SectionCard.displayName = "SectionCard";
 
 export default function Skills() {
-  return (
-    <section className="min-h-screen bg-[#F7F3EE] py-14 sm:py-20 lg:py-24 px-4 sm:px-6">
-      <div className="max-w-7xl mx-auto">
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: "-100px" });
 
-        <div className="text-center mb-12 sm:mb-16 lg:mb-20">
+  return (
+    <section ref={ref} className="min-h-screen bg-[#F7F3EE] py-14 sm:py-20 lg:py-24 px-4 sm:px-6">
+      <div className="max-w-7xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, ease: SPRING_EASE }}
+          className="text-center mb-12 sm:mb-16 lg:mb-20"
+        >
           <p className="uppercase tracking-[6px] sm:tracking-[8px] text-gray-500 text-xs sm:text-sm">
             MY TOOLBOX
           </p>
@@ -121,20 +184,31 @@ export default function Skills() {
             A collection of technologies I use to design, build and deploy
             scalable web applications.
           </p>
-        </div>
+        </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
-          {SECTIONS.map((section) => (
+        <motion.div
+          variants={cardContainer}
+          initial="hidden"
+          animate={inView ? "show" : "hidden"}
+          className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8"
+        >
+          {SECTIONS.map((section, i) => (
             <SectionCard
               key={section.title}
               title={section.title}
               icon={section.icon}
               skills={section.skills}
+              index={i}
             />
           ))}
-        </div>
+        </motion.div>
 
-        <div className="mt-12 sm:mt-16 lg:mt-20 rounded-2xl sm:rounded-3xl border border-gray-200 bg-white p-5 sm:p-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, delay: 0.5, ease: SPRING_EASE }}
+          className="mt-12 sm:mt-16 lg:mt-20 rounded-2xl sm:rounded-3xl border border-gray-200 bg-white p-5 sm:p-8"
+        >
           <h3 className="text-lg sm:text-2xl font-semibold mb-4 sm:mb-6">Currently Exploring</h3>
           <div className="flex flex-wrap gap-2 sm:gap-4">
             {EXPLORING.map((item) => (
@@ -146,8 +220,7 @@ export default function Skills() {
               </span>
             ))}
           </div>
-        </div>
-
+        </motion.div>
       </div>
     </section>
   );

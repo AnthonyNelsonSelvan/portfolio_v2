@@ -1,9 +1,35 @@
 import React, { useEffect, useRef } from "react";
+import { motion } from "framer-motion";
 
 // Static: defined once at module level, not recreated on every render
 const TECH_STACK = ["Node.js", "Express", "MongoDB", "React"];
 
-// Injected safely using dangerouslySetInnerHTML to prevent React parser bugs
+// Animation variants
+const container = {
+  hidden: {},
+  show: {
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.3,
+    },
+  },
+};
+
+const item = {
+  hidden: {
+    opacity: 0,
+    y: 20,
+  },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.6,
+      ease: [0.16, 1, 0.3, 1],
+    },
+  },
+};
+
 const HERO_STYLES = `
   @media (prefers-reduced-motion: no-preference) {
     [data-animate-scale] {
@@ -67,41 +93,54 @@ const Hero = () => {
       <style dangerouslySetInnerHTML={{ __html: HERO_STYLES }} />
 
       <div className="max-w-4xl text-center lg:text-left">
-        <h1
-          data-animate-scale
-          style={{ transitionDelay: "0ms" }}
+        <motion.h1
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           className="text-4xl sm:text-5xl lg:text-7xl font-bold leading-none tracking-tight text-[#1D1D1D]"
         >
-          Building <span className="text-[#3F6B57]">systems</span>
+          Building{" "}
+          <motion.span
+            initial={{ opacity: 0, color: "#3F6B57" }}
+            animate={{ opacity: 1, color: "#3F6B57" }}
+            transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+            className="text-[#3F6B57]"
+          >
+            systems
+          </motion.span>{" "}
           <br />
           that power
           <br />
           modern applications.
-        </h1>
+        </motion.h1>
 
-        <p
-          data-animate-scale
-          style={{ transitionDelay: "150ms" }}
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.3, ease: "easeOut" }}
           className="mt-8 max-w-xl mx-auto lg:mx-0 text-lg lg:text-xl leading-8 text-gray-600"
         >
           I design APIs, automate deployments, and build scalable backend
           systems that power modern web applications.
-        </p>
+        </motion.p>
 
-        <div
-          data-animate-scale
-          style={{ transitionDelay: "280ms" }}
+        <motion.div
+          variants={container}
+          initial="hidden"
+          animate="show"
           className="flex flex-wrap justify-center lg:justify-start gap-3 mt-10"
         >
           {TECH_STACK.map((tech) => (
-            <span
+            <motion.span
               key={tech}
-              className="px-5 py-2 rounded-full bg-[#ECE9E1] border border-[#DDD7C8]"
+              variants={item}
+              className="px-5 py-2 rounded-full bg-[#ECE9E1] border border-[#DDD7C8] hover:bg-[#3F6B57] hover:text-white hover:scale-105 transition-all duration-300 cursor-default"
+              whileHover={{ scale: 1.05 }}
             >
               {tech}
-            </span>
+            </motion.span>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

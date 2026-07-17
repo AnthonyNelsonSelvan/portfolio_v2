@@ -251,7 +251,7 @@ function ExperienceCard({ exp, index, totalCount }) {
                 {exp.websiteLabel}
               </motion.span>
               <motion.span variants={{ hover: { x: 3 } }} transition={{ type: "spring", stiffness: 400, damping: 20 }}>
-                →
+                &#8594;
               </motion.span>
             </motion.a>
           )}
@@ -266,7 +266,7 @@ function ExperienceCard({ exp, index, totalCount }) {
               onMouseLeave={handleMouseLeave}
               style={caseStudyBaseStyle}
             >
-              {exp.caseStudyLabel} →
+              {exp.caseStudyLabel} &#8594;
             </motion.button>
           )}
         </div>
