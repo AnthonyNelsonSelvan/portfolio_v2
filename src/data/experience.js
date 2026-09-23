@@ -35,7 +35,7 @@ export const experiences = [
       },
       {
         title: "Tech Stack",
-        items: ["React", "Node.js", "Express", "MongoDB"],
+        items: ["React", "Node.js", "Express", "MongoDB", "ArcGIS Maps SDK for Javascript"],
       },
     ],
 

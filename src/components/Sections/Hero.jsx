@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 
 // Static: defined once at module level, not recreated on every render
-const TECH_STACK = ["Node.js", "Express", "MongoDB", "React", "ArcGis"];
+const TECH_STACK = ["Node.js", "Express", "MongoDB", "React", "ArcGIS Maps SDK for JavaScript"];
 
 // Animation variants
 const container = {
