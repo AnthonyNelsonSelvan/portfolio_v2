@@ -9,7 +9,8 @@ export const experiences = [
     year: "2026",
 
     description:
-      "Sole developer responsible for building, deploying and maintaining all company software from customer-facing web presence to internal tooling and cloud infrastructure.",
+      "Sole developer responsible for building, deploying and maintaining company software, spanning customer-facing applications, internal business tools, GIS solutions, remote infrastructure management and cloud infrastructure.",
+
     responsibilities: [
       {
         title: "Built",
@@ -18,6 +19,8 @@ export const experiences = [
           "Admin Dashboard",
           "Invoice Generator",
           "20+ Internal Features",
+          "GIS Application for monitoring and visualizing camera locations through interactive maps and geospatial data",
+          "Remote PC Management Application for securely monitoring and controlling office computers from remote locations",
         ],
       },
       {

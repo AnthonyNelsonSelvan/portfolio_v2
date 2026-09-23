@@ -1,13 +1,29 @@
 import { memo, useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import {
-  FaCode, FaCss3Alt, FaDatabase, FaDocker, FaGitAlt,
-  FaGithub, FaHtml5, FaJs, FaNodeJs, FaPython,
-  FaReact, FaServer, FaTools,
+  FaCode,
+  FaCss3Alt,
+  FaDatabase,
+  FaDocker,
+  FaGitAlt,
+  FaGithub,
+  FaHtml5,
+  FaJs,
+  FaNodeJs,
+  FaPython,
+  FaReact,
+  FaServer,
+  FaTools,
 } from "react-icons/fa";
 import {
-  SiExpress, SiLinux, SiMongodb, SiNginx,
-  SiPostman, SiRedis, SiTailwindcss, SiTypescript,
+  SiExpress,
+  SiLinux,
+  SiMongodb,
+  SiNginx,
+  SiPostman,
+  SiRedis,
+  SiTailwindcss,
+  SiTypescript,
 } from "react-icons/si";
 import { VscVscode } from "react-icons/vsc";
 
@@ -51,6 +67,17 @@ const SECTIONS = [
     ],
   },
   {
+    title: "GIS & Mapping",
+    icon: null,
+    skills: [
+      { name: "ArcGIS Maps SDK for JavaScript", icon: null },
+      { name: "ArcGIS Feature Layers", icon: null },
+      { name: "Arcade", icon: null },
+      { name: "Spatial Queries", icon: null },
+      { name: "Geospatial Data", icon: null },
+    ],
+  },
+  {
     title: "Infrastructure",
     icon: <FaTools />,
     skills: [
@@ -75,10 +102,9 @@ const SECTIONS = [
 ];
 
 const EXPLORING = [
-  "System Design",
-  "Redis",
-  "Nginx",
+  "ArcGIS Maps SDK for JavaScript",
   "Scalable Backend Architecture",
+  "Advanced System Design",
 ];
 
 const SPRING_EASE = [0.16, 1, 0.3, 1];
@@ -143,7 +169,9 @@ const SectionCard = memo(({ title, icon, skills, index }) => {
     >
       <div className="flex items-center gap-2 sm:gap-3 mb-5 sm:mb-8 text-[#8B5E3C]">
         {icon && <div className="text-2xl sm:text-3xl">{icon}</div>}
-        <h2 className="text-lg sm:text-2xl font-semibold text-black">{title}</h2>
+        <h2 className="text-lg sm:text-2xl font-semibold text-black">
+          {title}
+        </h2>
       </div>
       <motion.div
         variants={chipContainer}
@@ -166,7 +194,10 @@ export default function Skills() {
   const inView = useInView(ref, { once: true, margin: "-100px" });
 
   return (
-    <section ref={ref} className="min-h-screen bg-[#F7F3EE] py-14 sm:py-20 lg:py-24 px-4 sm:px-6">
+    <section
+      ref={ref}
+      className="min-h-screen bg-[#F7F3EE] py-14 sm:py-20 lg:py-24 px-4 sm:px-6"
+    >
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -209,7 +240,9 @@ export default function Skills() {
           transition={{ duration: 0.6, delay: 0.5, ease: SPRING_EASE }}
           className="mt-12 sm:mt-16 lg:mt-20 rounded-2xl sm:rounded-3xl border border-gray-200 bg-white p-5 sm:p-8"
         >
-          <h3 className="text-lg sm:text-2xl font-semibold mb-4 sm:mb-6">Currently Exploring</h3>
+          <h3 className="text-lg sm:text-2xl font-semibold mb-4 sm:mb-6">
+            Currently Exploring
+          </h3>
           <div className="flex flex-wrap gap-2 sm:gap-4">
             {EXPLORING.map((item) => (
               <span
