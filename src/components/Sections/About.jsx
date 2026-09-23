@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { motion, useInView } from "framer-motion";
 
 const INTERESTS = [
+  "Gis Applications",
   "Backend Engineering",
   "Infrastructure",
   "System Design",

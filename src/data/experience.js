@@ -19,8 +19,8 @@ export const experiences = [
           "Admin Dashboard",
           "Invoice Generator",
           "20+ Internal Features",
-          "GIS Application for monitoring and visualizing camera locations through interactive maps and geospatial data",
-          "Remote PC Management Application for securely monitoring and controlling office computers from remote locations",
+          "GIS Application for CCTV visualization",
+          "Remote PC Management Application",
         ],
       },
       {
